@@ -35,10 +35,7 @@ jobs:
 
     - name: Test
       run: |
-        echo "Environment variables"
-        echo $GITHUB_AUTH_TOKEN
-        echo $GITHUB_EMAIL
         go test -v .
       env:
-        GITHUB_AUTH_TOKEN: ${TOKEN}
-        GITHUB_EMAIL: ${EMAIL}
+        GITHUB_AUTH_TOKEN: ${{ secrets.TOKEN}}
+        GITHUB_EMAIL: ${{ secrets.EMAIL}}
