@@ -1,4 +1,5 @@
 # Github Action Template Generator
+![Go](https://github.com/akhettar/ci-templater/workflows/Go/badge.svg)
 
 This tool uses a predefined Github action template to generate Github action pipeline based on the given template. See an example [template for java microservice to be deployed to AWS Kube cluster](templates/java-template.yml). This tool is very useful so as to ensure a consistent way of generating Github Action pipeline for given a group of services
 
