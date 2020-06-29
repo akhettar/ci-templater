@@ -26,6 +26,8 @@ repositories:
   - repo:
       url: https://github.com/cirtak/test_repo
       lang: java
+      service_name: test_repo
+       
   
   
 

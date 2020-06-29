@@ -35,7 +35,7 @@ repositories:
 The above configuration file contains list of the services or deployments.
 
 
-2. Template file - see [java-action-template.yml as example of java microservice to be deployed to AWS kube](templates/java-action-template.yml).
+2. Template file - see [java-action-template.yml as example of java microservice to be deployed to AWS kube](templates/java-template.yml).
 
 
 ### Running the tool

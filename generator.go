@@ -26,16 +26,12 @@ type Config struct {
 	Repositories []Repositories `yaml:"repositories"`
 }
 
-// Repo type
-type Repo struct {
-	Name string `yaml:"name"`
-	URL  string `yaml:"url"`
-	Lang string `yaml:"lang"`
-}
+// Repository type
+type Repository = map[string]string
 
 // Repositories type
 type Repositories struct {
-	Repo *Repo `yaml:"repo"`
+	Repo Repository `yaml:"repo,omitempty"`
 }
 
 // TemplateGenerator type
@@ -81,42 +77,43 @@ func (t *TemplateGenerator) run() []Report {
 	repo := os.Getenv(RepoName)
 
 	for _, r := range t.conf.Repositories {
-		r.Repo.Name = getRepoName(r.Repo.URL)
-		repoPath := fmt.Sprintf("repos/%s", r.Repo.Name)
+		repoName := getRepoName(r.Repo["url"])
+		repoPath := fmt.Sprintf("repos/%s", repoName)
 		branch := fmt.Sprintf("%s-%d", "githubAction", time.Now().UnixNano())
 
 		// escaping the repos if the flag is set to process only one given repository
-		if repo != "" && r.Repo.Name != repo {
+		if repo != "" && repoName != repo {
 			log.Printf("[repo flag] %s", repo)
-			log.Printf("[repo] %s", r.Repo.Name)
+			log.Printf("[repo] %s", repoName)
 
 			continue
 		}
 
-		log.Printf("processing repo: %s", r.Repo.URL)
+		log.Printf("processing repo: %s", r.Repo["url"])
 		wg.Add(1)
 
 		// process all the repositories in parallel
-		go func(wg *sync.WaitGroup, result chan Report, r Repo) {
+		go func(wg *sync.WaitGroup, result chan Report, r Repository) {
 			defer wg.Done()
 			//1. Prepare the repo
-			if err := t.client.prepareRepo(repoPath, branch, r.URL); err != nil {
+			url := r["url"]
+			if err := t.client.prepareRepo(repoPath, branch, url); err != nil {
 				log.Println("failed to prepare the repo")
-				result <- Report{r.URL, err}
+				result <- Report{url, err}
 				clearUp(repoPath)
 				return
 			}
 
 			// 2. render the template write it the repo path
 			if err := renderTemplate(r, repoPath); err != nil {
-				result <- Report{r.URL, err}
+				result <- Report{url, err}
 				clearUp(repoPath)
 				return
 			}
 
 			// 3. push and commit
-			if err := t.client.push(branch, r.URL); err != nil {
-				result <- Report{r.URL, err}
+			if err := t.client.push(branch, url); err != nil {
+				result <- Report{url, err}
 				clearUp(repoPath)
 				return
 			}
@@ -127,9 +124,9 @@ func (t *TemplateGenerator) run() []Report {
 			}
 
 			// everything went well publish report in the chanel
-			result <- Report{r.URL, nil}
+			result <- Report{url, nil}
 
-		}(&wg, reportChan, *r.Repo)
+		}(&wg, reportChan, r.Repo)
 	}
 
 	// wait for all the reports to come through
@@ -150,14 +147,14 @@ func (t *TemplateGenerator) run() []Report {
 	return reports
 }
 
-func renderTemplate(repo Repo, repoLocation string) error {
+func renderTemplate(repo Repository, repoLocation string) error {
 
 	gitHubDir := fmt.Sprintf("%s/%s", repoLocation, ".github")
 	workflowDir := fmt.Sprintf("%s/%s", repoLocation, ".github/workflows")
 	os.Mkdir(gitHubDir, os.ModePerm)
 	os.Mkdir(workflowDir, os.ModePerm)
 
-	templateBytes, err := ioutil.ReadFile(fmt.Sprintf("templates/%s-template.yml", repo.Lang))
+	templateBytes, err := ioutil.ReadFile(fmt.Sprintf("templates/%s-template.yml", repo["lang"]))
 	t := template.Must(template.New("githubAction").Funcs(templateFunc()).Delims("{[", "]}").Parse(string(templateBytes)))
 
 	//overwrite the config file with the template
@@ -167,7 +164,8 @@ func renderTemplate(repo Repo, repoLocation string) error {
 		log.Fatalf("failed to render the template, error: %v", err.Error())
 		return err
 	}
-	return t.Execute(fileToWrite, repo)
+	err = t.Execute(fileToWrite, repo)
+	return err
 }
 
 // Template function to be called from the template

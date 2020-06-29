@@ -17,6 +17,7 @@ func TestTemplateGenerator_run(t *testing.T) {
 	flag.Parse()
 
 	os.RemoveAll("repos/")
+
 	// process all the template
 	reports := Generartor().run()
 
