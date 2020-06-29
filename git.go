@@ -19,6 +19,23 @@ import (
 	git "gopkg.in/src-d/go-git.v4"
 )
 
+const (
+	// GithubUser for oauth2 authentication
+	GithubUser string = "githubTokenAuth"
+
+	// GithubAuthToken environment variable
+	GithubAuthToken string = "TOKEN"
+
+	// GPGPassword the gpg password
+	GPGPassword = "GPG_PASSWORD"
+
+	// GithubEmail the github email of the user running the action generator
+	GithubEmail = "GITHUB_EMAIL"
+
+	// DryRun flag to disable commiting the changes to the branch
+	DryRun = "DryRun"
+)
+
 var regex = regexp.MustCompile(".+(\\/)(.+)")
 
 // GitClient type

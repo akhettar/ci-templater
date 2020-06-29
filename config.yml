@@ -26,9 +26,7 @@ repositories:
   - repo:
       url: https://github.com/cirtak/test_repo
       lang: java
-  - repo:
-      url: https://github.com/cirtak/test_repo_dummy
-      lang: java    
+  
   
 
 

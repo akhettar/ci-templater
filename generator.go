@@ -17,6 +17,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// RepoName is the repo name to be processed
+const RepoName = "repo"
+
 // Config the Github action config
 type Config struct {
 	Description  string         `yaml:"description"`

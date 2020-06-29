@@ -1,11 +1,20 @@
 package main
 
 import (
+	"flag"
 	"os"
 	"testing"
 )
 
 func TestTemplateGenerator_run(t *testing.T) {
+
+	// os.Setenv(GithubAuthToken, "token")
+	// os.Setenv(GithubEmail, "some@email")
+
+	os.Setenv(GPGPassword, "")
+
+	flag.Set(DryRun, "true")
+	flag.Parse()
 
 	os.RemoveAll("repos/")
 	// process all the template
