@@ -35,3 +35,5 @@ jobs:
 
     - name: Test
       run: go test -v .
+      env:
+        GITHUB_AUTH_TOKEN: ${TOKEN}

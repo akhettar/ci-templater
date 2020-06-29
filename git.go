@@ -24,7 +24,7 @@ const (
 	GithubUser string = "githubTokenAuth"
 
 	// GithubAuthToken environment variable
-	GithubAuthToken string = "TOKEN"
+	GithubAuthToken string = "GITHUB_AUTH_TOKEN"
 
 	// GPGPassword the gpg password
 	GPGPassword = "GPG_PASSWORD"
