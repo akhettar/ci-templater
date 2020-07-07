@@ -155,36 +155,28 @@ func renderTemplate(repo Repository, repoLocation string) error {
 	os.Mkdir(gitHubDir, os.ModePerm)
 	os.Mkdir(workflowDir, os.ModePerm)
 
-	var templates []string
 	err := filepath.Walk("templates/", func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) == ".yml" {
-			templates = append(templates, path)
+			templateBytes, err := ioutil.ReadFile(path)
+			t := template.Must(template.New("githubAction").Funcs(templateFunc()).Delims("{[", "]}").Parse(string(templateBytes)))
+
+			//overwrite the config file with the template
+			filePath := fmt.Sprintf("%s/.github/workflows/%s", repoLocation, filepath.Base(path))
+			log.Printf("processing template: %s", filePath)
+			fileToWrite, err := os.Create(filePath)
+			if err != nil {
+				log.Fatalf("failed to render the template, error: %v", err.Error())
+				return err
+			}
+			if err = t.Execute(fileToWrite, repo); err != nil {
+				return err
+			}
 		}
 		return nil
 	})
 	if err != nil {
 		log.Println("failed to load the templates")
 		return err
-	}
-
-	log.Printf("templates: %v", templates)
-
-	for _, file := range templates {
-		templateBytes, err := ioutil.ReadFile(file)
-		t := template.Must(template.New("githubAction").Funcs(templateFunc()).Delims("{[", "]}").Parse(string(templateBytes)))
-
-		//overwrite the config file with the template
-		filePath := fmt.Sprintf("%s/.github/workflows/%s", repoLocation, filepath.Base(file))
-		log.Printf("handling filepath: %s", filePath)
-		fileToWrite, err := os.Create(filePath)
-		if err != nil {
-			log.Fatalf("failed to render the template, error: %v", err.Error())
-			return err
-		}
-		if err = t.Execute(fileToWrite, repo); err != nil {
-			return err
-		}
-
 	}
 	return nil
 }

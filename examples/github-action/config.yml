@@ -28,9 +28,3 @@ repositories:
       lang: java
       service_name: sample-java-app-service
       container_name: sample-java-app
-
-  - repo:
-      url: https://github.com/cirtak/test_repo
-      lang: go
-      service_name: sample-go-app-service
-      container_name: sample-go-app    
