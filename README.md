@@ -5,6 +5,8 @@
 This tool generate CI config for any given CI tool (Github Action, Circleci) from a given generic CI template. It ensures consistency of the CI template across all the deployments. This tool is particularily useful in the era of microservices architectural style whereby several microservices would share the same deployument pipeline. This tool allow to generate ci config for all these services from a one given ci template. See diagram below for the detailed flow:
 
 
+![illustaration](illustration.png)
+
 
 ## Why should you use this tool?
 
