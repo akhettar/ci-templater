@@ -1,52 +1,93 @@
-# Github Action Template Generator
+# CI Template Generator
 ![Build](https://github.com/akhettar/ci-templater/workflows/Master/badge.svg)
 ![Release](https://github.com/akhettar/ci-templater/workflows/Release/badge.svg)
 
-This tool uses a predefined Github action template to generate Github action pipeline based on the given template. See an example [template for java microservice to be deployed to AWS Kube cluster](templates/java-template.yml). This tool is very useful so as to ensure a consistent way of generating Github Action pipeline for given a group of services
+This tool generate CI config for any given CI tool (Github Action, Circleci) from a given generic CI template. It ensures consistency of the CI template across all the deployments. This tool is particularily useful in the era of microservices architectural style whereby several microservices would share the same deployument pipeline. This tool allow to generate ci config for all these services from a one given ci template. See diagram below for the detailed flow:
 
 
-## Why should you use this too?
 
-The alternative to not automate `ci pipeline generation` across all the deployements is to copy and paste. We all know what `c&p` means, it is a manual process and prone to making errors. This tool will perform the following for you.
+## Why should you use this tool?
 
-* There is only one source of the truth for the ci pipeline. Instances of the ci pipeline are gtenerated for a given deployment from this template
-* Generates multiple instances of ci confi pipeline in one go from a given config file.
-* Automatically creates a Pull request for all committed changes to Github.
+This CI templater ensures the followings:
+
+* CI pipeline for all the deployments are generated from a `SINGLE` CI template. 
+* Updates the CI pipeline for all deployments in one single run.
+* Creates Pull requests for all updated deployment pipelines.
 
 
 ## Usage
 
-### Configuration files
-This toll relies on two configuration files: 
+This tool relies on two configuration files as input:
 
-1. Configuration file that defines all the deployments with their corresponding Git repos - see [config.yml](config.yml). Here is a snippet a code
+1. Configuration file defining all the deployments with their corresponding Git repos - see [config.yml](config.yml). See a snippet below
 
 ```
 description: Generic template to generate github action configuration files for the repositories defined in the config file
 repositories:
   - repo:
       url: https://github.com/cirtak/test_repo
-      lang: java
-  - repo:
-      url: https://github.com/cirtak/test_repo_dummy
-      lang: java   
+      service_name: test_repo
+      key1: value1
+      key2: value2
+      ....: .....
+      keyn: valuen
+  
 ```      
 
-The above configuration file contains list of the services or deployments.
+The above configuration file contains list of the Git repositories we aim to generate or update the CI pipeline for. The `url` is the only mandotory parameter. You can define as many parameters in the form of `key` and `value`.
 
 
-2. Template file - see [java-action-template.yml as example of java microservice to be deployed to AWS kube](templates/java-template.yml).
+2. Template file - see [deploy-prod.yml as example of java microservice to be deployed to AWS kube](templates/deploy-prod.yml).
 
 
-### Running the tool
+Note that you can also define `templates` within the CI template - see [circleci pipeline example](templates/circleci-template.yml):
+
+Declare the template as follow
+
+```
+{[define "DEPLOYMENT"]}
+
+\\ something
+
+{[end]}
+```
+
+Invoke the template for each environment as follow by passing the relevant parameters
+
+```
+{[template "DEPLOYMENT" map "Env" "dev" "Name" .service_name  "AWSAccountNumber" "xxx128601811" ]}
+{[template "DEPLOYMENT" map "Env" "staging" "Name" .service_name "AWSAccountNumber" "xxx345174122" ]}
+{[template "DEPLOYMENT" map "Env" "prod" "Name" .service_name  "AWSAccountNumber" "xxx2574511" ]}
+```
+
+## Running the tool
+
+You can either checkout the ci-templater project or simply use the distributed binaries, see below details:
+
+### `Using the distributed binaries`
+
+a. Create a folder structure as shown in the [examples/github-action](examples/github-action) 
+
+b. Download the [latest release from here](https://github.com/akhettar/ci-templater/releases/) and unzip the binary in the avove folder
+
+c. That is it, you are ready to go and following in the insturction below
+
+d. Update the `config.yml` with all your target git repositories and add your CI tempaltes in the `templates` folder. Remvoe the existing ones as they are just samples.
+
+
+### `Checkout the whole project`
+
+You can simle chekout the whole `ci-tempalte` project and update the `config.ymml` and `templates` with the relevant CI pipeline tempaltes. Remove the existing ones as they are there as an example. Then follow the stesp below:
+
 
 1. Export the following as environment varialbes
 
 ```
 export GITHUB_TOKEN=xxx
-export GPG_PASSWORD=xxx - only needed if GPG signing is enalbed
-export GITHUB_EMAIL=xxx - this is the email address associated with your github account
+export GPG_PASSWORD=xxx - only needed if GPG signing is enabled
+export GITHUB_EMAIL=xxx - this is the email address associated with your git account
 ```
+
 
 2. Generate GPG private key if GPG signing is enabled
 
@@ -74,14 +115,14 @@ gpg --armor --export-secret-keys ${ID} > gpg-private-key
 3. Now you can run the tool with the following command: `go build && ./ci-templater`
 
 
-### Run the tool in dry mode
+### `Run the tool in dry mode`
 
 The defauilt set up of this tool is that it creates a pull request for each generated template. You can disable this by setting the `DryRun` flag as follow when running the tool
 
 ` go build && ./ci-templater -DryRun=true`
 
 
-### Generating the template for only one given depoloyment
+### `Generating the template for only one given depoloyment`
 
 By default the tool will extract the deployment details from `config.yml` then uses the appropriate template for each deployment. To apply the filter for only one depoloyment run the tool witht the `repo` flag
 
