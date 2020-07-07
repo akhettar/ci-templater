@@ -135,4 +135,8 @@ By default the tool will extract the deployment details from `config.yml` then u
 
 Currently, this tool assumes the generated ci pipelines are going to be pushed to Github repository. Support for other repositories will be added in due course. Enjoy!!
 
+## LICENSE
+
+[MIT](LICENSE)
+
 
