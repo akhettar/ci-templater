@@ -39,7 +39,7 @@ repositories:
 The above configuration file contains list of the Git repositories we aim to generate or update the CI pipeline for. The `url` is the only mandotory parameter. You can define as many parameters in the form of `key` and `value`.
 
 
-2. Template file - see [deploy-prod.yml as example of java microservice to be deployed to AWS kube](templates/deploy-prod.yml).
+2. Template file - This file contains the CI template from which instances of the CI piepline will be generated - see [Github action sample](templates/deploy-staging.yml).
 
 
 Note that you can also define `templates` within the CI template - see [circleci pipeline example](templates/circleci-template.yml):
