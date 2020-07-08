@@ -1,4 +1,4 @@
-# CI Template Generator
+# CI Templater
 ![Build](https://github.com/akhettar/ci-templater/workflows/Master/badge.svg)
 ![Release](https://github.com/akhettar/ci-templater/workflows/Release/badge.svg)
 
