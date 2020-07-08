@@ -76,6 +76,7 @@ c. That is it, you are ready to go and following in the instruction below
 
 d. Update the `config.yml` with all your target git repositories and add your CI templates in the `templates` folder. Remove the existing ones as they are just samples.
 
+e. Run the tool with following command:./ci-templater
 
 ### `Checkout the whole project`
 
